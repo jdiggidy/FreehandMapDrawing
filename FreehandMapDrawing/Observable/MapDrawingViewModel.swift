@@ -8,14 +8,16 @@
 import SwiftUI
 import Observation
 import MapboxMaps
+import SwiftData
 
 @Observable
 class MapDrawingViewModel {
-    var drawnShapes: [DrawnShape] = []
+    
     var currentDrawPoints: [CGPoint] = []
     var drawMode: DrawMode = .line
     var mapView: MapView?
     var mapSize: CGSize = .zero
+    var modelContext: ModelContext?
     var lineStrokeColor: Color = .red
     var polygonStrokeColor: Color = .blue
     var polygonFillColor: Color = .blue.opacity(0.3)
@@ -53,6 +55,13 @@ class MapDrawingViewModel {
             return
         }
         
+        guard let context = modelContext else {
+            print("No model context available")
+            currentDrawPoints = []
+            isDrawing = false
+            return
+        }
+        
         let shape = DrawnShape(
             coordinates: coordinates,
             type: drawMode == .line ? .line : .polygon,
@@ -61,16 +70,23 @@ class MapDrawingViewModel {
             lineWidth: lineWidth
         )
         
-        drawnShapes.append(shape)
+        context.insert(shape)
+        
+        do {
+            try context.save()
+            print("Shape saved successfully. ID: \(shape.id)")
+        } catch {
+            print("Failed to save shape: \(error)")
+        }
         currentDrawPoints = []
         isDrawing = false
     }
     
     func clearShapes() {
-        drawnShapes.removeAll()
+        //drawnShapes.removeAll()
     }
     
     func deleteShape(ofType type: DrawnShape.ShapeType) {
-        drawnShapes.removeAll { $0.type == type }
+        //drawnShapes.removeAll { $0.type == type }
     }
 }

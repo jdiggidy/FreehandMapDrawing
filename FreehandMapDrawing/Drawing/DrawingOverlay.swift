@@ -25,7 +25,14 @@ struct DrawingOverlay: View {
             
             // Draw completed shapes
             for shape in drawnShapes {
-                let points = shape.coordinates.compactMap { coord in
+                
+                let coordinates = shape.coordinates
+                let shapeType = shape.type
+                let strokeColor = shape.strokeColor
+                let fillColor = shape.fillColor
+                let lineWidth = shape.lineWidth
+                
+                let points = coordinates.compactMap { coord in
                     MapCoordinateConverter.coordinateToPoint(
                         coord,
                         mapView: mapView
@@ -34,19 +41,21 @@ struct DrawingOverlay: View {
                 
                 guard points.count > 1 else { continue }
                 
-                switch shape.type {
+                switch shapeType {
                 case .line:
                     DrawingFunctions.drawLine(
                         context: context,
                         points: points,
-                        color: .red
+                        color: .red,
+                        lineWidth: lineWidth
                     )
                 case .polygon:
                     DrawingFunctions.drawPolygon(
                         context: context,
                         points: points,
-                        fillColor: .blue.opacity(0.3),
-                        strokeColor: .blue
+                        fillColor: fillColor ?? .blue.opacity(0.3),
+                        strokeColor: strokeColor,
+                        lineWidth: lineWidth
                     )
                 }
             }
@@ -55,19 +64,30 @@ struct DrawingOverlay: View {
             if drawMode != .none && currentDrawPoints.count > 1 {
                 switch drawMode {
                 case .line:
-                    DrawingFunctions.drawLine(context: context, points: currentDrawPoints, color: .red)
+                    DrawingFunctions.drawLine(
+                        context: context,
+                        points: currentDrawPoints,
+                        color: currentStrokeColor,
+                        lineWidth: currentLineWidth
+                    )
                 case .polygon:
                     // Need at least 3 points for a visible polygon
                     if currentDrawPoints.count > 2 {
                         DrawingFunctions.drawPolygon(
                             context: context,
                             points: currentDrawPoints,
-                            fillColor: .blue.opacity(0.3),
-                            strokeColor: .blue
+                            fillColor: currentFillColor,
+                            strokeColor: currentStrokeColor,
+                            lineWidth: currentLineWidth
                         )
                     } else {
                         // Show line preview until we have 3 points
-                        DrawingFunctions.drawLine(context: context, points: currentDrawPoints, color: .blue)
+                        DrawingFunctions.drawLine(
+                            context: context,
+                            points: currentDrawPoints,
+                            color: currentStrokeColor,
+                            lineWidth: currentLineWidth
+                        )
                     }
                 case .none:
                     break

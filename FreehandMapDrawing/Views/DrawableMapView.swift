@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DrawableMapView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var savedShapes: [DrawnShape]
     @State private var viewModel = MapDrawingViewModel()
     
     var body: some View {
@@ -18,7 +21,7 @@ struct DrawableMapView: View {
             )
                 
             DrawingOverlay(
-                drawnShapes: viewModel.drawnShapes,
+                drawnShapes: savedShapes,
                 currentDrawPoints: viewModel.currentDrawPoints,
                 drawMode: viewModel.drawMode,
                 currentStrokeColor: viewModel.currentStrokeColor,
@@ -26,6 +29,7 @@ struct DrawableMapView: View {
                 currentLineWidth: viewModel.lineWidth,
                 mapView: viewModel.mapView
             )
+            .allowsHitTesting(false)
             
             DrawingGestureLayer(
                 isEnabled: viewModel.drawMode != .none,
@@ -40,17 +44,31 @@ struct DrawableMapView: View {
                 polygonStrokeColor: $viewModel.polygonStrokeColor,
                 polygonFillColor: $viewModel.polygonFillColor,
                 lineWidth: $viewModel.lineWidth,
-                onClear: viewModel.clearShapes,
-                onDelete: viewModel.deleteShape
+                onClear: {clearAllShapes()},
+                onDelete: { type in deleteShapes(ofType: type) }
             )
         }
         .background(
             GeometryReader { geo in
                 Color.clear.onAppear {
                     viewModel.mapSize = geo.size
+                    viewModel.modelContext = modelContext
                 }
             }
         )
+    }
+    
+    private func clearAllShapes() {
+        for shape in savedShapes {
+            modelContext.delete(shape)
+        }
+    }
+    
+    private func deleteShapes(ofType type: DrawnShape.ShapeType) {
+        let shapesToDelete = savedShapes.filter { $0.type == type }
+        for shape in shapesToDelete {
+            modelContext.delete(shape)
+        }
     }
 }
 
