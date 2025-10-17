@@ -12,25 +12,34 @@ struct DrawableMapView: View {
     
     var body: some View {
         ZStack {
-            MapLayer(
-                mapView: $viewModel.mapView,
-                drawMode: viewModel.drawMode
+            MapboxMap(
+                drawMode: $viewModel.drawMode,
+                mapView: $viewModel.mapView
             )
-            
+                
             DrawingOverlay(
                 drawnShapes: viewModel.drawnShapes,
                 currentDrawPoints: viewModel.currentDrawPoints,
                 drawMode: viewModel.drawMode,
+                currentStrokeColor: viewModel.currentStrokeColor,
+                currentFillColor: viewModel.currentFillColor,
+                currentLineWidth: viewModel.lineWidth,
                 mapView: viewModel.mapView
             )
             
             DrawingGestureLayer(
+                isEnabled: viewModel.drawMode != .none,
                 onDragChanged: viewModel.handleDragChanged,
                 onDragEnded: viewModel.handleDragEnded
             )
+            .allowsHitTesting(viewModel.drawMode != .none)
             
             DrawingControls(
                 drawMode: $viewModel.drawMode,
+                lineStrokeColor: $viewModel.lineStrokeColor,
+                polygonStrokeColor: $viewModel.polygonStrokeColor,
+                polygonFillColor: $viewModel.polygonFillColor,
+                lineWidth: $viewModel.lineWidth,
                 onClear: viewModel.clearShapes,
                 onDelete: viewModel.deleteShape
             )

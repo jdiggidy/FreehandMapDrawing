@@ -7,6 +7,7 @@
 
 import SwiftUI
 struct DrawingGestureLayer: View {
+    let isEnabled: Bool
     let onDragChanged: (CGPoint) -> Void
     let onDragEnded: () -> Void
     
@@ -14,13 +15,13 @@ struct DrawingGestureLayer: View {
         Color.clear
             .contentShape(Rectangle())
             .gesture(
-                DragGesture(minimumDistance: 0)
+               isEnabled ? DragGesture(minimumDistance: 0)
                     .onChanged { value in
                         onDragChanged(value.location)
                     }
                     .onEnded { _ in
                         onDragEnded()
-                    }
+                    } : nil 
             )
     }
 }

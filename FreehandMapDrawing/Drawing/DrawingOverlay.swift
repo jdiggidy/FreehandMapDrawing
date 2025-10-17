@@ -12,6 +12,9 @@ struct DrawingOverlay: View {
     let drawnShapes: [DrawnShape]
     let currentDrawPoints: [CGPoint]
     let drawMode: DrawMode
+    let currentStrokeColor: Color
+    let currentFillColor: Color
+    let currentLineWidth: CGFloat
     let mapView: MapView?
     
     var body: some View {

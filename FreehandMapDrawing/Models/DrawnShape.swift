@@ -12,6 +12,9 @@ struct DrawnShape: Identifiable{
     let id = UUID()
     let coordinates: [CLLocationCoordinate2D]
     let type: ShapeType
+    let strokeColor: Color
+    let fillColor: Color?
+    let lineWidth: CGFloat
     
     enum ShapeType {
         case line

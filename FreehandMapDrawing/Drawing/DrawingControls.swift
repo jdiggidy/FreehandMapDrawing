@@ -9,8 +9,14 @@ import SwiftUI
 
 struct DrawingControls: View {
     @Binding var drawMode: DrawMode
+    @Binding var lineStrokeColor: Color
+    @Binding var polygonStrokeColor: Color
+    @Binding var polygonFillColor: Color
+    @Binding var lineWidth: CGFloat
     let onClear: () -> Void
     let onDelete: (DrawnShape.ShapeType) -> Void
+    
+    @State private var showStyleOptions = false
     
     var body: some View {
         VStack {
@@ -18,9 +24,11 @@ struct DrawingControls: View {
                 ModeButton(
                     title: "Map",
                     isSelected: drawMode == .none,
-                    color: .green) {
+                    color: .green
+                ) {
                         drawMode = .none
-                    }
+                }
+                
                 ModeButton(
                     title: "Line",
                     isSelected: drawMode == .line,
@@ -38,6 +46,17 @@ struct DrawingControls: View {
                 }
                 
                 Spacer()
+                
+                Button {
+                    showStyleOptions.toggle()
+                } label: {
+                    Image(systemName: "paintbrush.fill")
+                        .padding()
+                        .background(showStyleOptions ? Color.purple : Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+
                 
                 Menu {
                     Button(role: .destructive) {
@@ -72,6 +91,53 @@ struct DrawingControls: View {
             .padding()
             .background(Color.white.opacity(0.9))
             
+            // style options
+            
+            if showStyleOptions {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Style Options")
+                        .font(.headline)
+                        .padding(.bottom, 4)
+                    
+                    if drawMode == .line {
+                        HStack {
+                            Text("Line Color:")
+                            Spacer()
+                            ColorPicker("", selection: $lineStrokeColor)
+                                .labelsHidden()
+                        }
+                    }
+                    
+                    if drawMode == .polygon {
+                        HStack {
+                            Text("Stroke Color:")
+                            Spacer()
+                            ColorPicker("", selection: $polygonStrokeColor)
+                                .labelsHidden()
+                        }
+                        
+                        HStack {
+                            Text("Fill Color:")
+                            Spacer()
+                            ColorPicker("", selection: $polygonFillColor)
+                                .labelsHidden()
+                        }
+                    }
+                    
+                    if drawMode != .none {
+                        VStack(alignment: .leading) {
+                            Text("Line Width: \(Int(lineWidth))px")
+                            Slider(value: $lineWidth, in: 1...10, step: 1)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color.white.opacity(0.95))
+                .cornerRadius(10)
+                .padding(.horizontal)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            
             Spacer()
             
             HStack {
@@ -85,6 +151,7 @@ struct DrawingControls: View {
             .cornerRadius(10)
             .padding()
         }
+        .animation(.easeInOut, value: showStyleOptions)
     }
     
     private var statusText: String {

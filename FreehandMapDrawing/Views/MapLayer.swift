@@ -22,6 +22,12 @@ struct MapLayer: UIViewRepresentable {
     let drawMode: DrawMode
     
     func makeUIView(context: Context) -> MapView {
+        
+        mapView?.gestures.options.panEnabled = true
+        mapView?.gestures.options.pinchEnabled = true
+        mapView?.gestures.options.rotateEnabled = true
+        mapView?.gestures.options.pitchEnabled = true
+        
         let mapView = MapView(frame: .zero)
         
         // Configure initial camera

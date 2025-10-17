@@ -16,8 +16,20 @@ class MapDrawingViewModel {
     var drawMode: DrawMode = .line
     var mapView: MapView?
     var mapSize: CGSize = .zero
+    var lineStrokeColor: Color = .red
+    var polygonStrokeColor: Color = .blue
+    var polygonFillColor: Color = .blue.opacity(0.3)
+    var lineWidth: CGFloat = 3
     
     private var isDrawing = false
+    
+    var currentStrokeColor: Color {
+        drawMode == .line ? lineStrokeColor : polygonStrokeColor
+    }
+    
+    var currentFillColor: Color {
+        polygonFillColor
+    }
     
     func handleDragChanged(_ location: CGPoint) {
         isDrawing = true
@@ -43,7 +55,10 @@ class MapDrawingViewModel {
         
         let shape = DrawnShape(
             coordinates: coordinates,
-            type: drawMode == .line ? .line : .polygon
+            type: drawMode == .line ? .line : .polygon,
+            strokeColor: currentStrokeColor,
+            fillColor: drawMode == .polygon ? currentFillColor : nil,
+            lineWidth: lineWidth
         )
         
         drawnShapes.append(shape)
