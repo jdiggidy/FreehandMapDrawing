@@ -10,10 +10,17 @@ import SwiftUI
 struct DrawingControls: View {
     @Binding var drawMode: DrawMode
     let onClear: () -> Void
+    let onDelete: (DrawnShape.ShapeType) -> Void
     
     var body: some View {
         VStack {
             HStack {
+                ModeButton(
+                    title: "Map",
+                    isSelected: drawMode == .none,
+                    color: .green) {
+                        drawMode = .none
+                    }
                 ModeButton(
                     title: "Line",
                     isSelected: drawMode == .line,
@@ -32,12 +39,34 @@ struct DrawingControls: View {
                 
                 Spacer()
                 
-                Button(action: onClear) {
+                Menu {
+                    Button(role: .destructive) {
+                        onDelete(.line)
+                    } label: {
+                        Label("Delete Lines", systemImage: "line.diagonal")
+                    }
+                    
+                    Button(role: .destructive) {
+                        onDelete(.polygon)
+                    } label: {
+                        Label("Delete Polygons", systemImage: "square")
+                    }
+                    
+                    Divider()
+                    
+                    Button(role: .destructive) {
+                        onClear()
+                    } label: {
+                        Label("Delete All", systemImage: "trash.fill")
+                    }
+                } label: {
                     Image(systemName: "trash")
                         .padding()
                         .background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(8)
+                } primaryAction: {
+                    // This allows long press, but you can also just tap to open menu
                 }
             }
             .padding()
@@ -45,12 +74,38 @@ struct DrawingControls: View {
             
             Spacer()
             
-            Text("Drag to draw on map")
-                .padding()
-                .background(Color.black.opacity(0.7))
-                .foregroundColor(.white)
-                .cornerRadius(10)
-                .padding()
+            HStack {
+                Image(systemName: statusIcon)
+                    .foregroundColor(.white)
+                Text(statusText)
+                    .foregroundColor(.white)
+            }
+            .padding()
+            .background(Color.black.opacity(0.7))
+            .cornerRadius(10)
+            .padding()
+        }
+    }
+    
+    private var statusText: String {
+        switch drawMode {
+        case .none:
+            return "Map mode - pan and zoom"
+        case .line:
+            return "Drawing lines - drag to draw"
+        case .polygon:
+            return "Drawing polygons - drag to draw"
+        }
+    }
+    
+    private var statusIcon: String {
+        switch drawMode {
+        case .none:
+            return "map"
+        case .line:
+            return "line.diagonal"
+        case .polygon:
+            return "square"
         }
     }
 }

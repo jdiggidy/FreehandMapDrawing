@@ -20,6 +20,7 @@ struct DrawnShape: Identifiable{
 }
 
 enum DrawMode {
+    case none
     case line
     case polygon
 }

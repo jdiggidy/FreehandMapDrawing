@@ -54,4 +54,8 @@ class MapDrawingViewModel {
     func clearShapes() {
         drawnShapes.removeAll()
     }
+    
+    func deleteShape(ofType type: DrawnShape.ShapeType) {
+        drawnShapes.removeAll { $0.type == type }
+    }
 }

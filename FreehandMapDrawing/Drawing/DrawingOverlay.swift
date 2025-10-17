@@ -49,15 +49,12 @@ struct DrawingOverlay: View {
             }
             
             // Draw current shape being drawn
-            if currentDrawPoints.count > 1 {
+            if drawMode != .none && currentDrawPoints.count > 1 {
                 switch drawMode {
                 case .line:
-                    DrawingFunctions.drawLine(
-                        context: context,
-                        points: currentDrawPoints,
-                        color: .red
-                    )
+                    DrawingFunctions.drawLine(context: context, points: currentDrawPoints, color: .red)
                 case .polygon:
+                    // Need at least 3 points for a visible polygon
                     if currentDrawPoints.count > 2 {
                         DrawingFunctions.drawPolygon(
                             context: context,
@@ -66,9 +63,11 @@ struct DrawingOverlay: View {
                             strokeColor: .blue
                         )
                     } else {
+                        // Show line preview until we have 3 points
                         DrawingFunctions.drawLine(context: context, points: currentDrawPoints, color: .blue)
                     }
-                    
+                case .none:
+                    break
                 }
             }
         }

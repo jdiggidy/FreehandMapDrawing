@@ -12,7 +12,10 @@ struct DrawableMapView: View {
     
     var body: some View {
         ZStack {
-            MapLayer(mapView: $viewModel.mapView)
+            MapLayer(
+                mapView: $viewModel.mapView,
+                drawMode: viewModel.drawMode
+            )
             
             DrawingOverlay(
                 drawnShapes: viewModel.drawnShapes,
@@ -28,7 +31,8 @@ struct DrawableMapView: View {
             
             DrawingControls(
                 drawMode: $viewModel.drawMode,
-                onClear: viewModel.clearShapes
+                onClear: viewModel.clearShapes,
+                onDelete: viewModel.deleteShape
             )
         }
         .background(

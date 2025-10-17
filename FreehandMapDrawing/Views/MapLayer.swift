@@ -15,8 +15,11 @@ extension CLLocationCoordinate2D {
 }
 
 
+
+
 struct MapLayer: UIViewRepresentable {
     @Binding var mapView: MapView?
+    let drawMode: DrawMode
     
     func makeUIView(context: Context) -> MapView {
         let mapView = MapView(frame: .zero)
@@ -38,6 +41,11 @@ struct MapLayer: UIViewRepresentable {
     
     func updateUIView(_ uiView: MapView, context: Context) {
         // Update map if needed
+        let isMapMode = (drawMode == DrawMode.none)
+        uiView.gestures.options.panEnabled = isMapMode
+        uiView.gestures.options.pinchEnabled = isMapMode
+        uiView.gestures.options.rotateEnabled = isMapMode
+        uiView.gestures.options.pitchEnabled = isMapMode
     }
 }
 
